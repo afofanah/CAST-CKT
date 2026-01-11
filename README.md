@@ -98,6 +98,7 @@ The framework supports four major traffic datasets:
 | Shenzhen | 627 | 17,280 | Shenzhen | 15 minutes |
 
 ### Dataset Structure
+```
 data/
 ├── metr-la/
 │   ├── dataset.npy           # Traffic flow data [34272, 207, 1]
@@ -122,6 +123,7 @@ data/
 └── cache/             # Auto-generated cache directory
     ├── enhanced_*.pkl # Preprocessed datasets with physics features
     └── features_*.pkl # Cached chaos features
+```
 
 ## Configuration
 
