@@ -1,0 +1,143 @@
+data:
+  data_keys: ["metr-la", "pems-bay", "shenzhen", "chengdu_m"]
+  
+  metr-la:
+    dataset_path: data/metr-la/dataset.npy
+    adjacency_matrix_path: data/metr-la/matrix.npy
+    time_step: 34272
+    node_num: 207
+    speed_mean: 58.465786
+    speed_std: 12.905341
+    enable_spatiotemporal_learning: true
+
+  pems-bay:
+    dataset_path: data/pems-bay/dataset.npy
+    adjacency_matrix_path: data/pems-bay/matrix.npy
+    time_step: 52116
+    node_num: 325
+    speed_mean: 62.621582859
+    speed_std: 9.58811369696
+    enable_spatiotemporal_learning: true
+    
+  chengdu_m:
+    dataset_path: data/chengdu_m/dataset.npy
+    adjacency_matrix_path: data/chengdu_m/matrix.npy
+    time_step: 17280
+    node_num: 524
+    speed_mean: 29.0982979559
+    speed_std: 9.75304346669
+    enable_spatiotemporal_learning: true
+
+  shenzhen:
+    dataset_path: data/shenzhen/dataset.npy
+    adjacency_matrix_path: data/shenzhen/matrix.npy
+    time_step: 17280
+    node_num: 627
+    speed_mean: 30.5735608506
+    speed_std: 11.0922606598
+    enable_spatiotemporal_learning: true
+
+model:
+  type: "chaos_aware"
+  name: ChaosAwareTrafficPredictor
+  hidden_dim: 16
+  chaos_dim: 20 #16
+  output_dim: 1
+  num_heads: 8 #8
+  dropout: 0.1
+  noise_std: 0.005
+
+training:
+  epochs: 500
+  source_epochs: 200
+  source_lr: 0.0005
+  target_epochs: 300
+  target_lr: 0.0002
+  batch_size: 8
+  test_batch_size: 8
+  learning_rate: 0.0005
+  weight_decay: 1e-4
+  gradient_clip: 1.0
+  
+  scheduler:
+    type: plateau
+    factor: 0.7
+    patience: 8
+    min_lr: 1e-6
+  
+  early_stopping:
+    patience: 15
+    min_delta: 1e-5
+    restore_best_weights: true
+  
+  test_dataset: chengdu_m
+  target_days: 3
+  add_physics_features: true
+
+few_shot:
+  enabled: true
+  support_size: 8
+  query_size: 12
+  meta_epochs: 100
+  inner_lr: 0.001
+  outer_lr: 0.0002
+  num_tasks: 2
+  adaptation_steps: 5
+  
+  gradient_clip_inner: 1.0
+  gradient_clip_outer: 1.0
+
+experiment:
+  name: physics_traffic_prediction_improved
+  save_dir: experiments
+  log_dir: logs
+  plot_dir: plots
+  seed: 42
+  device: auto
+
+task:
+  his_num: 12
+  pred_num: 12
+  batch_size: 8 #8
+  test_batch_size: 8 #8
+
+logging:
+  level: INFO
+  save_metrics: true
+  plot_training_curves: true
+  plot_predictions: true
+  plot_physics_features: false
+  save_model_checkpoints: true
+  checkpoint_frequency: 10
+
+evaluation:
+  metrics: [MAE, RMSE, MAPE, R2]
+  plot_nodes: [0, 1, 2, 3, 4]
+  plot_time_steps: [0, 3, 6, 9, 11]
+  
+  horizons:
+    metr-la:
+      5min: 1
+      15min: 3
+      30min: 6
+      60min: 12
+      90min: 18
+      120min: 24
+    
+    pems-bay:
+      5min: 1
+      15min: 3
+      30min: 6
+      60min: 12
+      90min: 18
+      120min: 24
+    
+    default:
+      step1: 1
+      step3: 3
+      step6: 6
+      step12: 12
+
+validation:
+  split_ratio: 0.8
+  shuffle: false
